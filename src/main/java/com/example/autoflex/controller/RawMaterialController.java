@@ -22,7 +22,7 @@ public class RawMaterialController {
         return repository.save(material);
     }
 
-    // READ ALL
+    // READ
     @GetMapping
     public List<RawMaterial> getAll() {
         return repository.findAll();

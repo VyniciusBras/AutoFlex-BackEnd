@@ -70,7 +70,7 @@ public class DataInitializer {
 
             pRepo.saveAll(Arrays.asList(axe, pickaxe));
 
-            System.out.println("BACK-END RODANDO E BANCO POPULADO!");
+            System.out.println("BACK-END IS RUNNING!");
         };
     }
 }

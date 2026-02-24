@@ -19,8 +19,6 @@ public class Product {
     @JsonManagedReference
     private List<ProductComposition> compositions;
 
-    // Adição recomendada: Método utilitário para garantir que a relação
-    // seja salva corretamente no banco de ambos os lados.
     public void setCompositions(List<ProductComposition> compositions) {
         this.compositions = compositions;
         if (compositions != null) {
