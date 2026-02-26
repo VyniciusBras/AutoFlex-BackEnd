@@ -5,54 +5,51 @@ import com.example.autoflex.model.Product;
 import com.example.autoflex.model.ProductComposition;
 import com.example.autoflex.model.RawMaterial;
 import com.example.autoflex.repository.ProductRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class ProductionServiceTest {
 
-    @Autowired
-    private ProductionService productionService;
-
-    @MockitoBean
+    @Mock
     private ProductRepository productRepository;
 
-    @Test
-    void shouldCalculateFiveUnitsWhenStockAllows() {
-        // Cenário: Criar um material com 10 unidades em estoque
-        RawMaterial iron = new RawMaterial();
-        iron.setName("Iron");
-        iron.setStockQuantity(10.0);
+    @InjectMocks
+    private ProductionService productionService; // Nome corrigido aqui
 
-        // Criar um produto que exige 2 unidades de ferro por item
-        Product axe = new Product();
-        axe.setName("Iron Axe");
-        axe.setPrice(100.0);
+    @Test
+    @DisplayName("Deve calcular corretamente que é possível produzir 5 unidades")
+    void shouldCalculateCorrectProductionQuantity() {
+        // GIVEN: Um produto que pede 2 madeiras, e temos 10 no estoque
+        RawMaterial wood = new RawMaterial();
+        wood.setName("Wood");
+        wood.setStockQuantity(10.0);
 
         ProductComposition comp = new ProductComposition();
-        comp.setRawMaterial(iron);
+        comp.setRawMaterial(wood);
         comp.setQuantityRequired(2.0);
-        comp.setProduct(axe);
 
-        axe.setCompositions(Arrays.asList(comp));
+        Product axe = new Product();
+        axe.setName("Iron Axe");
+        axe.setPrice(50.0);
+        axe.setCompositions(List.of(comp));
 
-        // Simular o banco de dados retornando este produto
-        Mockito.when(productRepository.findAll()).thenReturn(Arrays.asList(axe));
+        Mockito.when(productRepository.findAll()).thenReturn(List.of(axe));
 
-        // Executar o cálculo
-        List<ProductionSuggestionDTO> suggestions = productionService.calculateSuggestions();
+        // WHEN: Executamos o cálculo
+        List<ProductionSuggestionDTO> result = productionService.calculateSuggestions();
 
-        // Verificação: 10/2 = 5 unidades possíveis
-        assertEquals(1, suggestions.size());
-        assertEquals("Iron Axe", suggestions.get(0).getProductName());
-        assertEquals(5, suggestions.get(0).getQuantityPossible());
+        // THEN: 10 / 2 = 5 unidades possíveis
+        Assertions.assertFalse(result.isEmpty());
+        Assertions.assertEquals(5, result.get(0).getQuantityPossible());
+        Assertions.assertEquals(250.0, result.get(0).getTotalPrice()); // 5 * 50.0
     }
 }
