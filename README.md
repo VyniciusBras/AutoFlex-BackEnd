@@ -64,7 +64,7 @@ git clone https://github.com/VyniciusBras/AutoFlex-BackEnd.git
 cd AutoFlex
 
 # Subir o ambiente completo, no terminal da pasta raiz, execute:
-docker-compose up --build
+docker-compose up -d
 
 # Verificar o status:
 A API estará ativa em http://localhost:8080. O log deverá exibir a mensagem: BACK-END IS RUNNING!
